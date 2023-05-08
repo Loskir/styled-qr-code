@@ -117,13 +117,13 @@ export default class QRCanvas {
 
     this.clear();
     this.drawBackground();
-    this.drawDots((i: number, j: number): boolean => {
+    this.drawDots((j: number, i: number): boolean => {
       if (this._options.imageOptions.hideBackgroundDots) {
         if (
-          j >= (count - drawImageSize.hideXDots) / 2 &&
-          j < (count + drawImageSize.hideXDots) / 2 &&
-          i >= (count - drawImageSize.hideYDots) / 2 &&
-          i < (count + drawImageSize.hideYDots) / 2
+          i >= (count - drawImageSize.hideXDots) / 2 &&
+          i < (count + drawImageSize.hideXDots) / 2 &&
+          j >= (count - drawImageSize.hideYDots) / 2 &&
+          j < (count + drawImageSize.hideYDots) / 2
         ) {
           return false;
         }
