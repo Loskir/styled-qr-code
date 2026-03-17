@@ -7,9 +7,16 @@ import defaultOptions, { RequiredOptions } from './QROptions.js';
 import gradientTypes from '../constants/gradientTypes.js';
 import { QRCode, Gradient, FilterFunction, Options } from '../types';
 import getMode from '../tools/getMode.js';
-import { Canvas, CanvasRenderingContext2D, ExportFormat, RenderOptions, loadImage, Image } from 'skia-canvas';
+import {
+  Canvas,
+  CanvasGradient,
+  CanvasRenderingContext2D,
+  ExportFormat,
+  RenderOptions,
+  loadImage,
+  Image
+} from 'skia-canvas';
 import qrcode from 'qrcode-generator';
-import { promises as fs } from 'fs';
 import mergeDeep from '../tools/merge.js';
 import sanitizeOptions from '../tools/sanitizeOptions.js';
 
@@ -54,10 +61,7 @@ export default class QRCanvas {
     this._options = mergedOptions;
 
     //Explicit cast due to type mismatch on skia canvas and qrcode types. Due to missing function definition in skia canvas renderer which is never used
-    this._qr = qrcode(
-      this._options.qrOptions.typeNumber,
-      this._options.qrOptions.errorCorrectionLevel
-    ) as any as QRCode;
+    this._qr = qrcode(this._options.qrOptions.typeNumber, this._options.qrOptions.errorCorrectionLevel);
 
     this._qr.addData(this._options.data, this._options.qrOptions.mode || getMode(this._options.data));
     this.created = this.drawQR();
@@ -483,7 +487,7 @@ export default class QRCanvas {
    */
   async toDataUrl(format: ExportFormat = 'png', options?: RenderOptions): Promise<string> {
     await this.created;
-    return this._canvas.toDataURL(format, options);
+    return this._canvas.toURL(format, options);
   }
 
   /**
@@ -496,6 +500,9 @@ export default class QRCanvas {
    */
   async toFile(filePath: string, format: ExportFormat = 'png', options?: RenderOptions): Promise<void> {
     await this.created;
-    return fs.writeFile(filePath, await this._canvas.toBuffer(format, options));
+    return this._canvas.toFile(filePath, {
+      format,
+      ...options
+    });
   }
 }
